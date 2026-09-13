@@ -5,55 +5,97 @@ const BACKEND_URL =
   process.env.FORECAST_API_URL ??
   (process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:8000' : null);
 
-export async function POST(request: NextRequest) {
-  const search = request.nextUrl.search;
-  let body: Record<string, any> = {};
-  try {
-    body = await request.json();
-  } catch {
-    body = {};
-  }
-
-  if (BACKEND_URL) {
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 3000);
-      const res = await fetch(`${BACKEND_URL}/api/forecast/interventions${search}`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', accept: 'application/json' },
-        body: JSON.stringify(body),
-        signal: controller.signal,
-      });
-      clearTimeout(timer);
-      if (res.ok) {
-        const data = await res.json();
-        return NextResponse.json(data);
-      }
-    } catch {
-      // Fall through to fallback data if local or external backend is unreachable
-    }
-  }
-
-  const stubble = body.stubble_reduction ?? 0;
-  const truck = body.truck_restriction ?? 'off';
-  const oddEven = Boolean(body.odd_even);
-
-  const key = `${stubble}_${truck}_${oddEven}`;
+function resolveScenario(stubbleInput: any, truckInput: any, oddEvenInput: any) {
   const scenarios = fallbackData.scenarios as Record<string, any>;
-  const scenario = scenarios[key] ?? scenarios['0_off_false'];
+  const stubbleNum = Number(stubbleInput) || 0;
+  let stubbleStr = '0.0';
+  let stubbleInt = '0';
+  if (stubbleNum >= 0.7) {
+    stubbleStr = '0.8';
+    stubbleInt = '0.8';
+  } else if (stubbleNum >= 0.3) {
+    stubbleStr = '0.5';
+    stubbleInt = '0.5';
+  }
 
-  return NextResponse.json(scenario);
+  const truckStr = String(truckInput ?? 'off').toLowerCase().trim();
+  const validTruck = ['bs4_banned', 'all_halted'].includes(truckStr) ? truckStr : 'off';
+  const oeBool = Boolean(
+    oddEvenInput === true || oddEvenInput === 'true' || oddEvenInput === 1 || oddEvenInput === '1'
+  );
+
+  const candidates = [
+    `${stubbleInt}_${validTruck}_${oeBool ? 'true' : 'false'}`,
+    `${stubbleStr}_${validTruck}_${oeBool ? 'true' : 'false'}`,
+    `${stubbleStr}_${validTruck}_${oeBool ? 'True' : 'False'}`,
+    `${stubbleInt}_${validTruck}_${oeBool ? 'True' : 'False'}`,
+    '0_off_false',
+    '0.0_off_False',
+    '0.0_off_false',
+  ];
+
+  for (const k of candidates) {
+    if (scenarios[k]) return scenarios[k];
+  }
+
+  return Object.values(scenarios)[0];
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const search = request.nextUrl.search;
+    let body: Record<string, any> = {};
+    try {
+      body = await request.json();
+    } catch {
+      body = {};
+    }
+
+    if (BACKEND_URL) {
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 3000);
+        const res = await fetch(`${BACKEND_URL}/api/forecast/interventions${search}`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', accept: 'application/json' },
+          body: JSON.stringify(body),
+          signal: controller.signal,
+        });
+        clearTimeout(timer);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data === 'object') {
+            return NextResponse.json(data);
+          }
+        }
+      } catch {
+        // Fall through to fallback data if local or external backend is unreachable
+      }
+    }
+
+    const scenario = resolveScenario(
+      body.stubble_reduction,
+      body.truck_restriction,
+      body.odd_even
+    );
+    return NextResponse.json(scenario);
+  } catch {
+    const scenarios = fallbackData.scenarios as Record<string, any>;
+    return NextResponse.json(Object.values(scenarios)[0]);
+  }
 }
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const stubble = parseFloat(searchParams.get('stubble_reduction') ?? '0');
-  const truck = searchParams.get('truck_restriction') ?? 'off';
-  const oddEven = searchParams.get('odd_even') === 'true';
-
-  const key = `${stubble}_${truck}_${oddEven}`;
-  const scenarios = fallbackData.scenarios as Record<string, any>;
-  const scenario = scenarios[key] ?? scenarios['0_off_false'];
-
-  return NextResponse.json(scenario);
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const scenario = resolveScenario(
+      searchParams.get('stubble_reduction'),
+      searchParams.get('truck_restriction'),
+      searchParams.get('odd_even')
+    );
+    return NextResponse.json(scenario);
+  } catch {
+    const scenarios = fallbackData.scenarios as Record<string, any>;
+    return NextResponse.json(Object.values(scenarios)[0]);
+  }
 }

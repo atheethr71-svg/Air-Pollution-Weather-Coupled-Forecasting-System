@@ -1,0 +1,28 @@
+{
+  "name": "delhi-ncr-aqi-forecast",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Delhi NCR 72-hour PM2.5 forecast dashboard (Next.js + MapLibre GL + Deck.gl)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@deck.gl/aggregation-layers": "^9.0.0",
+    "@deck.gl/core": "^9.0.0",
+    "@deck.gl/layers": "^9.0.0",
+    "@deck.gl/mapbox": "^9.0.0",
+    "maplibre-gl": "^4.7.1",
+    "next": "^15.5.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.6.0"
+  }
+}

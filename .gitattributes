@@ -1,0 +1,15 @@
+# Normalise line endings in the repository to LF.
+#
+# This matters most for the Dockerfile: a CRLF line ending (which a Windows
+# editor or a mis-set core.autocrlf will happily produce) breaks the
+# backslash line-continuations in `RUN` instructions and the image fails to
+# build with a confusing error.
+* text=auto eol=lf
+
+# Binary assets are never touched.
+*.png binary
+*.jpg binary
+*.webp binary
+
+# Keep the Windows entrypoint usable by cmd.exe, which wants CRLF.
+*.bat text eol=crlf

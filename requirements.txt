@@ -1,0 +1,9 @@
+# Runtime dependencies for the Delhi NCR 72-hour PM2.5 forecast API.
+# The coupled model itself needs only numpy + scipy; fastapi/uvicorn serve it
+# and httpx talks to Open-Meteo / NASA FIRMS.
+fastapi>=0.115,<0.200
+uvicorn>=0.30,<1.0
+pydantic>=2.8,<3.0
+httpx>=0.27,<0.29
+numpy>=1.26,<3.0
+scipy>=1.11,<2.0

@@ -1,17 +1,21 @@
 /** @type {import('next').NextConfig} */
-const FORECAST_API_URL = process.env.FORECAST_API_URL ?? 'http://127.0.0.1:8000';
+const FORECAST_API_URL = process.env.FORECAST_API_URL;
 
 const nextConfig = {
   reactStrictMode: true,
-  // Proxy /api/* to the FastAPI forecast service so the browser sees a
-  // same-origin API and no CORS configuration is needed in development.
+  // If FORECAST_API_URL is configured (e.g. pointing to a deployed FastAPI service),
+  // proxy /api/* directly to it. Otherwise, Next.js App Router route handlers
+  // in app/api/forecast/* serve the endpoints natively (ideal for Vercel deployments).
   async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${FORECAST_API_URL}/api/:path*`,
-      },
-    ];
+    if (FORECAST_API_URL) {
+      return [
+        {
+          source: '/api/:path*',
+          destination: `${FORECAST_API_URL}/api/:path*`,
+        },
+      ];
+    }
+    return [];
   },
   // Deck.gl ships ESM with modern syntax; letting Next transpile it avoids
   // "unexpected token" failures in older browsers/build pipelines.

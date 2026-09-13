@@ -63,6 +63,13 @@ No configuration is required. With no API key present the service runs on synthe
 meteorology and a synthetic fire inventory, and says so in every response's
 `provenance.notes`.
 
+### Deploying to Vercel
+
+The Next.js dashboard is configured for **zero-config deployment on Vercel**:
+1. Import this repository into [Vercel](https://vercel.com) and click **Deploy**.
+2. Built-in Next.js Route Handlers serve the 72-hour forecast map layers and the GRAP what-if simulator directly on Vercel without requiring an external server.
+3. *(Optional)* If you host the full Python physical engine (using the included `Dockerfile` on Render, Railway, Fly.io, or Cloud Run), add the `FORECAST_API_URL` environment variable in your Vercel Project Settings pointing to your Python service (e.g., `https://my-backend.onrender.com`).
+
 ## API
 
 | Endpoint | Purpose |

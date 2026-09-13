@@ -25,8 +25,9 @@ import os
 import sys
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 _PROJECT_ROOT = Path(__file__).resolve().parent
 if str(_PROJECT_ROOT) not in sys.path:  # keep `uvicorn main:app` cwd-independent
@@ -80,10 +81,24 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=cors_origins(),
         allow_credentials=False,
-        allow_methods=["GET"],
+        allow_methods=["*"],
         allow_headers=["*"],
     )
     application.include_router(forecast_router)
+
+    @application.api_route(
+        "/api/interventions",
+        methods=["GET", "POST"],
+        include_in_schema=False,
+    )
+    @application.api_route(
+        "/api/intervention",
+        methods=["GET", "POST"],
+        include_in_schema=False,
+    )
+    async def redirect_interventions(req: Request) -> RedirectResponse:
+        url = req.url.replace(path="/api/forecast/interventions")
+        return RedirectResponse(url=str(url), status_code=307)
 
     @application.get("/health", tags=["ops"], summary="Liveness probe")
     async def health() -> dict[str, str]:

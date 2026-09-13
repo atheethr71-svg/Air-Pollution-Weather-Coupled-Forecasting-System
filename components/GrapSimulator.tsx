@@ -437,7 +437,12 @@ export default function GrapSimulator({
       })
         .then(async (response) => {
           if (!response.ok) {
-            throw new Error(`Intervention API returned ${response.status} ${response.statusText}`);
+            if (response.status === 404) {
+              throw new Error(
+                'Intervention API returned 404. Please verify the Python API is running on port 8000 (python main.py).'
+              );
+            }
+            throw new Error(`Intervention API returned ${response.status} ${response.statusText}`.trim());
           }
           return (await response.json()) as InterventionsResponse;
         })

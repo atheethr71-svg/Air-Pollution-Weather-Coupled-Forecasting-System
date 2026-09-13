@@ -825,6 +825,11 @@ async def forecast_72h(
     response_model=InterventionsResponse,
     summary="What-if GRAP intervention scenarios for Delhi NCR",
 )
+@router.post(
+    "/intervention",
+    response_model=InterventionsResponse,
+    include_in_schema=False,
+)
 async def forecast_interventions(
     request: InterventionRequest,
     latitude: float = Query(DELHI_NCR_CENTER[0], ge=-90.0, le=90.0),
@@ -971,6 +976,55 @@ async def forecast_interventions(
         urban_source=describe_urban_source(delhi_ncr_grid(), params),
         provenance=provenance,
         notes=notes,
+    )
+
+
+@router.get(
+    "/interventions",
+    response_model=InterventionsResponse,
+    summary="What-if GRAP intervention scenarios (GET)",
+)
+@router.get(
+    "/intervention",
+    response_model=InterventionsResponse,
+    include_in_schema=False,
+)
+async def get_forecast_interventions(
+    stubble_reduction: float = Query(0.0, ge=0.0, le=1.0),
+    truck_restriction: Literal["off", "bs4_banned", "all_halted"] = Query("off"),
+    odd_even: bool = Query(False),
+    latitude: float = Query(DELHI_NCR_CENTER[0], ge=-90.0, le=90.0),
+    longitude: float = Query(DELHI_NCR_CENTER[1], ge=-180.0, le=180.0),
+    hours: int = Query(FORECAST_HOURS, ge=1, le=FORECAST_HOURS),
+    window_hours: int = Query(
+        48, ge=1, le=FORECAST_HOURS, description="Horizon the averted peak is measured over"
+    ),
+    inflow_pm25: float = Query(45.0, ge=0.0, le=1000.0),
+    frp_scale: float = Query(1.0, gt=0.0, le=100.0),
+    initial_background: float = Query(40.0, ge=0.0),
+    initial_urban_increment: float = Query(110.0, ge=0.0),
+    urban_emission: float = Query(URBAN_EMISSION_PEAK_UG_M2_S, ge=0.0, le=20.0),
+    offline: bool = Query(False, description="Skip the network and use synthetic inputs (demo mode)"),
+    refresh: bool = Query(False, description="Ignore cached inputs and refetch upstream"),
+) -> InterventionsResponse:
+    """Convenience GET endpoint mirroring ``POST /interventions``."""
+    return await forecast_interventions(
+        request=InterventionRequest(
+            stubble_reduction=stubble_reduction,
+            truck_restriction=truck_restriction,
+            odd_even=odd_even,
+        ),
+        latitude=latitude,
+        longitude=longitude,
+        hours=hours,
+        window_hours=window_hours,
+        inflow_pm25=inflow_pm25,
+        frp_scale=frp_scale,
+        initial_background=initial_background,
+        initial_urban_increment=initial_urban_increment,
+        urban_emission=urban_emission,
+        offline=offline,
+        refresh=refresh,
     )
 
 

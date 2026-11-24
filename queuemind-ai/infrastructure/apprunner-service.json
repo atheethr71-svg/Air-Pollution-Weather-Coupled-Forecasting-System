@@ -1,0 +1,28 @@
+{
+  "ServiceName": "queuemind-ai-backend",
+  "SourceConfiguration": {
+    "CodeRepository": {
+      "RepositoryUrl": "https://github.com/YOUR_GITHUB_USER/queuemind-ai",
+      "SourceCodeVersion": {
+        "Type": "BRANCH",
+        "Value": "main"
+      },
+      "CodeConfiguration": {
+        "ConfigurationSource": "REPOSITORY"
+      }
+    },
+    "AutoDeploymentsEnabled": true
+  },
+  "InstanceConfiguration": {
+    "Cpu": "1 vCPU",
+    "Memory": "2 GB"
+  },
+  "HealthCheckConfiguration": {
+    "Protocol": "HTTP",
+    "Path": "/api/health",
+    "Interval": 10,
+    "Timeout": 5,
+    "HealthyThreshold": 1,
+    "UnhealthyThreshold": 3
+  }
+}

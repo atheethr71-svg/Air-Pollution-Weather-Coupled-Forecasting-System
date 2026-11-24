@@ -19,6 +19,21 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "components/Navbar.tsx",
+    "components/Sidebar.tsx",
+    "components/AIAssistantWidget.tsx",
+    "lib/**/*.ts",
+    "lib/**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "civiclens",
+    "components/views",
+    "queuemind-ai"
+  ]
 }

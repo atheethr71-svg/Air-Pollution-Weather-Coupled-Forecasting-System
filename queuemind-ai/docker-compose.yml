@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: queuemind-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./queuemind.db
+      - SECRET_KEY=queuemind-super-secure-production-jwt-token-2026
+      - DEMO_MODE=true
+      - AWS_REGION=us-east-1
+      - AWS_S3_BUCKET_NAME=queuemind-ai-media
+      - AWS_CLOUDWATCH_LOG_GROUP=/aws/apprunner/queuemind-ai
+    volumes:
+      - ./backend/data:/app/data
+      - ./backend/uploads:/app/uploads
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: queuemind-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped

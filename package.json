@@ -1,8 +1,8 @@
 {
-  "name": "delhi-ncr-aqi-forecast",
+  "name": "queuemind-ai",
   "version": "1.0.0",
   "private": true,
-  "description": "Delhi NCR 72-hour PM2.5 forecast dashboard (Next.js + MapLibre GL + Deck.gl)",
+  "description": "QueueMind AI – Smart Queue Monitoring & Predictive Management System (Hackathon Track 2: Beyond the Browser)",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,15 +14,23 @@
     "@deck.gl/core": "^9.0.0",
     "@deck.gl/layers": "^9.0.0",
     "@deck.gl/mapbox": "^9.0.0",
+    "canvas-confetti": "^1.9.4",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.54.0",
     "maplibre-gl": "^4.7.1",
     "next": "^15.5.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "recharts": "^3.11.1",
+    "tailwind-merge": "^3.7.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.6.1",
+    "postcss": "^8.5.29",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5.6.0"
   }
 }

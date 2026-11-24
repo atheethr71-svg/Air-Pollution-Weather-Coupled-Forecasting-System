@@ -9,6 +9,8 @@ next-env.d.ts
 __pycache__/
 *.py[cod]
 .venv/
+*.db
+uploads/
 
 # Local env
 .env
@@ -16,5 +18,11 @@ __pycache__/
 .DS_Store
 *.log
 
-# Tooling metadata (contains machine-local absolute paths)
+# Personal files & downloads
+*.docx
+*.pdf
+DOWNLOAD_REPORT.html
+
+# Tooling metadata
 .freebuff/
+.vercel
